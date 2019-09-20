@@ -1,69 +1,56 @@
 <template>
   <v-container>
+    <v-row>
+      <v-col>
+        {{ timeLeft }}
+      </v-col>
+    </v-row>
     <v-row class="home">
       <v-row>
         <v-col>
-          Home component
-          <v-row><v-btn @click="createNewProblem">Click</v-btn></v-row>
+            SCORE ({{score}})
         </v-col>
       </v-row>
       <v-col>
-        <v-col xs12>
-          <v-select
-            :items="numbers"
-            v-model="multiplicandMaxVar"
-            label="Multiplicand MAX"
-            @change="handleProduct()"
-          >
-          </v-select>
-        </v-col>
-        <v-col xs12>
-          <v-select
-            :items="numbers"
-            v-model="multiplierMaxVar"
-            label="Multiplier MAX"
-            @change="handleProduct()"
-          >
-          </v-select>
-        </v-col>
-        <v-col xs12>
-          <v-select
-            :items="timerOptions"
-            v-model="timerLimitMax"
-            label="Time Limit"
-            @change="handleTime()"
-          >
-          </v-select>
-        </v-col>
-      </v-col>
-      <v-col column>
         <v-col>
-          {{ multiplicand }}
+          {{' '}}{{ multiplicand }}
         </v-col>
         <v-col>
-          {{ multiplier }}
+        x  {{ multiplier }}
         </v-col>
         <v-col>
           -------
         </v-col>
         <v-col>
-          {{ product }}
+          <v-row>
+            <v-col>
+              <v-form
+                ref="form"
+                v-model="valid"
+                :lazy-validation="true"
+              >
+                <v-text-field
+                  v-model="productAnswer"
+                  :rules="numberRules"
+                  label="Answer"
+                  required
+                ></v-text-field>
+              </v-form>
+            </v-col>
+            <v-col>
+              <v-btn
+                :disabled="!valid"
+                color="success"
+                class="mr-4"
+                @click="submitAnswer"
+              >
+                Submit
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-col>
-      </v-col>
-      
+      </v-col> 
     </v-row>
-    <v-row>
-      <v-col>
-        {{ timeLimit / 1000 }} second(s)
-      </v-col>
-    </v-row>
-
-
-    <!-- Choose Options -->
-
-
-
-    <!-- Start Program -->
   </v-container>
 </template>
 
@@ -74,14 +61,14 @@ import { mapActions, mapGetters } from "vuex";
     name: "Home",
     data() {
       return {
-        numbers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        multiplicandMaxVar: 0,
-        productVar: this.handleProduct(),
-        multiplierMaxVar: 0,
+        valid: false,
+        numberRules: [
+          v => !!v || 'Answer the problem, silly!'
+        ],
+        productAnswer: null,
         multiplicandVar: 0,
         multiplierVar: 0,
-        timerLimitMax: 0,
-        timerOptions: [{ text: '30 seconds', value: 30000}, {text: '1 min', value: 60000}, {text: '1.5 minutes', value: '90000'}, {text: '2 mins', value: '120000'}]
+        
       }
     },
     computed: {
@@ -104,15 +91,17 @@ import { mapActions, mapGetters } from "vuex";
         "setMultiplicand",
         "setMultiplier",
         "getProduct",
-        "createNewProblem"
+        "createNewProblem",
+        "incrementScore"
       ]),
-      handleProduct() {
-        this.setMultiplicandMax(this.multiplicandMaxVar);
-        this.setMultiplierMax(this.multiplierMaxVar);
+      submitAnswer() {
+        if (this.productAnswer == this.product) {
+          this.incrementScore();
+          this.createNewProblem();
+        } else {
+          this.createNewProblem();
+        }
       },
-      handleTime() {
-        this.setTimerLength(this.timerLimitMax)
-      }
     }
   }
 </script>
